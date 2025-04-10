@@ -10,6 +10,8 @@ from sklearn.metrics import mean_squared_error
 import streamlit as st
 import io
 
+st.set_page_config(page_title="SmartPredict", page_icon="🚚", layout="wide")
+
 # 1. File Upload Interface
 st.title("📊 AI-Driven Predictive Analytics for Small Businesses")
 st.write("Upload your historical monthly business data (CSV format)")
