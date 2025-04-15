@@ -10,8 +10,6 @@ from sklearn.metrics import mean_squared_error
 import streamlit as st
 import io
 
-st.set_page_config(page_title="SmartPredict", page_icon="📈", layout="wide")
-
 # 1. File Upload Interface
 st.title("📊 AI-Driven Predictive Analytics for Small Businesses")
 st.write("Upload your historical monthly business data (CSV format)")
@@ -88,6 +86,13 @@ if uploaded_file:
 
     if duplicates_removed > 0:
         st.info(f"ℹ️ {duplicates_removed} duplicate entries (based on month) were removed from your uploaded data.")
+
+    # 📅 Show All Monthly Data from CSV
+    st.subheader("📅 Historical Monthly Data Overview")
+    st.dataframe(df[['month', 'ads_spent', 'customer_visits', 'sales']])
+
+    # Optional line chart of historical sales
+    st.line_chart(df.set_index('month')['sales'])
 
     # User Inputs for Forecasting
     st.subheader("🛠 Forecast Settings")
