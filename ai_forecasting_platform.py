@@ -13,7 +13,6 @@ import io
 import os
 from datetime import datetime
 
-<<<<<<< Updated upstream
 # 1. File Upload Interface
 st.title("📊 AI-Driven Predictive Analytics for Small Businesses")
 st.write("Upload your historical monthly business data (CSV format)")
