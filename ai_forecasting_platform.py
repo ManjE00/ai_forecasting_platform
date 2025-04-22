@@ -1,4 +1,3 @@
-# === AI-Driven Predictive Analytics Platform (Streamlit Web App) ===
 # === AI-Driven Predictive Analytics Platform with Admin/User Login ===
 
 import pandas as pd
@@ -13,13 +12,6 @@ import io
 import os
 from datetime import datetime
 
-# 1. File Upload Interface
-st.title("📊 AI-Driven Predictive Analytics for Small Businesses")
-st.write("Upload your historical monthly business data (CSV format)")
-
-uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
-
-# 2. Load Data
 # Dummy credentials
 USER_CREDENTIALS = {"user": "user123", "admin": "admin123"}
 
@@ -38,7 +30,7 @@ def login():
             st.session_state.logged_in = True
             st.session_state.role = "admin" if username == "admin" else "user"
             st.success(f"Welcome, {st.session_state.role.title()}!")
-            st.rerun()  # <- Updated from st.experimental_rerun()
+            st.rerun()
         else:
             st.error("Invalid username or password.")
 
@@ -50,18 +42,14 @@ if not st.session_state.logged_in:
 def preprocess_data(df):
     required_columns = ['month', 'ads_spent', 'customer_visits', 'sales']
     missing_columns = [col for col in required_columns if col not in df.columns]
-
     if missing_columns:
         raise ValueError(f"The following required columns are missing: {missing_columns}")
-
     df['month'] = pd.to_datetime(df['month'], errors='coerce')
     duplicates_removed = df.duplicated(subset=['month']).sum()
     df = df.drop_duplicates(subset=['month'], keep='last')
     df = df.sort_values('month')
     df['month_number'] = range(1, len(df) + 1)
     return df, duplicates_removed
-
-# 3. Train or Load Model
 
 # Model training
 def train_model(data):
@@ -74,8 +62,6 @@ def train_model(data):
     mse = mean_squared_error(y_test, preds)
     joblib.dump(model, 'monthly_sales_forecast_model.pkl')
     return model, mse
-
-# 4. Forecasting Function (Enhanced)
 
 # Forecast function
 def forecast(model, last_month_num, last_month_date, forecast_months, ads_spent, customer_visits):
@@ -93,8 +79,6 @@ def forecast(model, last_month_num, last_month_date, forecast_months, ads_spent,
     )
     return next_months
 
-# 5. Visualization
-
 # Visualization
 def plot_forecast(original, forecast):
     fig, ax = plt.subplots(figsize=(10,6))
@@ -107,25 +91,15 @@ def plot_forecast(original, forecast):
     ax.grid(True)
     st.pyplot(fig)
 
-# 6. Main Execution
-
-if uploaded_file:
-    df = pd.read_csv(uploaded_file)
-    df, duplicates_removed = preprocess_data(df)
-
-    st.subheader("🧹 Cleaned & Processed Data Preview")
-    st.write(df.head())
-
-    if duplicates_removed > 0:
-        st.info(f"ℹ️ {duplicates_removed} duplicate entries (based on month) were removed from your uploaded data.")
-
 # Save logs (for admin view)
 def save_to_log(dataframe):
-    os.makedirs("logs", exist_ok=True)
+    now = str(pd.Timestamp.now())
+    log_dir = "logs"
+    os.makedirs(log_dir, exist_ok=True)  # Create directory if it doesn't exist
 
-    now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    filename = f"logs/forecast_log_{now}.csv"
+    filename = f"{log_dir}/forecast_log_{now.replace(':','-').replace(' ','_')}.csv"
     dataframe.to_csv(filename, index=False)
+    
 # ===================== USER VIEW =====================
 if st.session_state.role == "user":
     st.title("📊 AI-Driven Predictive Analytics for Small Businesses")
@@ -143,46 +117,6 @@ if st.session_state.role == "user":
         st.write(df.head())
         if duplicates_removed > 0:
             st.info(f"ℹ️ {duplicates_removed} duplicate entries (based on month) were removed.")
-
-    # 📅 Show All Monthly Data from CSV
-    st.subheader("📅 Historical Monthly Data Overview")
-    st.dataframe(df[['month', 'ads_spent', 'customer_visits', 'sales']])
-
-    # Optional line chart of historical sales
-    st.line_chart(df.set_index('month')['sales'])
-
-    # User Inputs for Forecasting
-    st.subheader("🛠 Forecast Settings")
-    forecast_months = st.slider("How many months do you want to forecast?", min_value=1, max_value=24, value=6)
-    future_ads = st.number_input("Estimated Ads Spent for Future Months", min_value=0, value=4000)
-    future_visits = st.number_input("Estimated Customer Visits for Future Months", min_value=0, value=600)
-
-    model, mse = train_model(df)
-    st.success(f"✅ Model trained successfully! Mean Squared Error: {mse:.2f}")
-
-    forecast_df = forecast(
-        model,
-        df['month_number'].iloc[-1],
-        df['month'].iloc[-1],
-        forecast_months,
-        future_ads,
-        future_visits
-    )
-
-    st.subheader(f"📈 Forecasted Sales for Next {forecast_months} Month(s)")
-    st.write(forecast_df[['month', 'forecasted_sales']])
-
-    st.download_button(
-        label="📥 Download Forecast Data as CSV",
-        data=forecast_df.to_csv(index=False).encode('utf-8'),
-        file_name='forecasted_sales.csv',
-        mime='text/csv'
-    )
-
-    st.subheader("📊 Visualization")
-    plot_forecast(df, forecast_df)
-else:
-    st.warning("Please upload a CSV file with 'month', 'sales', 'ads_spent', and 'customer_visits' columns.")
 
         st.subheader("📅 Historical Monthly Data Overview")
         st.dataframe(df[['month', 'ads_spent', 'customer_visits', 'sales']])
@@ -231,4 +165,4 @@ elif st.session_state.role == "admin":
 if st.button("🔒 Logout"):
     st.session_state.logged_in = False
     st.session_state.role = None
-    st.rerun()  # <- Updated from st.experimental_rerun()
+    st.rerun()
