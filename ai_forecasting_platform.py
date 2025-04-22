@@ -20,8 +20,6 @@ st.write("Upload your historical monthly business data (CSV format)")
 uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
 
 # 2. Load Data
-
-=======
 # Dummy credentials
 USER_CREDENTIALS = {"user": "user123", "admin": "admin123"}
 
@@ -29,7 +27,6 @@ USER_CREDENTIALS = {"user": "user123", "admin": "admin123"}
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
     st.session_state.role = None
->>>>>>> Stashed changes
 
 # Login function
 def login():
@@ -147,7 +144,6 @@ if st.session_state.role == "user":
         if duplicates_removed > 0:
             st.info(f"ℹ️ {duplicates_removed} duplicate entries (based on month) were removed.")
 
-<<<<<<< Updated upstream
     # 📅 Show All Monthly Data from CSV
     st.subheader("📅 Historical Monthly Data Overview")
     st.dataframe(df[['month', 'ads_spent', 'customer_visits', 'sales']])
@@ -187,11 +183,10 @@ if st.session_state.role == "user":
     plot_forecast(df, forecast_df)
 else:
     st.warning("Please upload a CSV file with 'month', 'sales', 'ads_spent', and 'customer_visits' columns.")
-=======
+
         st.subheader("📅 Historical Monthly Data Overview")
         st.dataframe(df[['month', 'ads_spent', 'customer_visits', 'sales']])
         st.line_chart(df.set_index('month')['sales'])
->>>>>>> Stashed changes
 
         st.subheader("🛠 Forecast Settings")
         forecast_months = st.slider("How many months to forecast?", 1, 24, 6)
